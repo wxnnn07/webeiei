@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ตารางติว — Study Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Noto+Serif+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#18181A;--ink2:#3A3A3E;--ink3:#6B6B72;--ink4:#9C9CA4;--ink5:#C8C8CE;
+  --paper:#F8F7F4;--surface:#FFFFFF;--surface2:#F2F1EE;--surface3:#E8E7E2;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --accent:#1A6B4A;--accent2:#2D9B6F;--accent-bg:#EBF5F0;--accent-mid:#52B788;
+  --r:10px;--r-sm:6px;--r-lg:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun',sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+.app{display:flex;flex-direction:column;min-height:100vh;}
+
+/* HEADER */
+header{background:var(--ink);padding:14px 20px;position:sticky;top:0;z-index:200;}
+.hd{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.hd-brand{display:flex;align-items:center;gap:10px;}
+.hd-mark{width:30px;height:30px;background:var(--accent2);border-radius:7px;display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+.hd h1{font-family:'Noto Serif Thai',serif;font-size:16px;font-weight:600;color:#fff;}
+.hd p{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px;}
+.nav{display:flex;gap:3px;background:rgba(255,255,255,.06);border-radius:7px;padding:3px;}
+.nav-btn{padding:5px 12px;border:none;background:transparent;color:rgba(255,255,255,.45);font-family:'Sarabun',sans-serif;font-size:13px;border-radius:5px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.nav-btn.on{background:rgba(255,255,255,.12);color:#fff;font-weight:500;}
+
+main{flex:1;max-width:760px;width:100%;margin:0 auto;padding:18px 15px 72px;}
+.panel{display:none;animation:fi .2s ease;}
+.panel.on{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* SECTIONS */
+.sec{margin-bottom:14px;}
+.sec-hd{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.sec-ico{width:26px;height:26px;border-radius:6px;background:var(--surface3);display:grid;place-items:center;font-size:13px;flex-shrink:0;}
+.sec-lbl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;}
+
+/* FORM */
+.fi{margin-bottom:12px;}
+.fi label{display:block;font-size:13px;font-weight:500;color:var(--ink2);margin-bottom:4px;}
+input[type=text],input[type=number],select{width:100%;padding:8px 11px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:14px;color:var(--ink);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s;appearance:none;}
+input:focus,select:focus{border-color:var(--accent-mid);box-shadow:0 0 0 3px rgba(82,183,136,.15);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* CHIPS */
+.chip-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.chip{padding:5px 12px;border-radius:18px;border:1.5px solid var(--border2);background:var(--surface);font-size:13px;font-weight:500;color:var(--ink3);cursor:pointer;user-select:none;transition:all .15s;}
+.chip:hover{border-color:var(--accent-mid);}
+.chip.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.add-row{display:flex;gap:7px;}
+.add-row input{flex:1;}
+.btn-sm{padding:8px 13px;border-radius:var(--r-sm);border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+.btn-sm:hover{background:#d4ede2;}
+
+/* BOOST STEPS */
+.boost-grid{display:flex;flex-direction:column;gap:9px;}
+.boost-row{display:flex;align-items:center;gap:8px;}
+.boost-name{min-width:108px;font-size:13px;color:var(--ink);}
+.boost-steps{display:flex;gap:3px;flex:1;}
+.boost-step{flex:1;height:26px;border-radius:4px;border:1.5px solid var(--border2);background:var(--surface3);cursor:pointer;transition:all .12s;}
+.boost-step.lit{border-color:transparent;}
+.boost-step[data-lv="1"].lit{background:#C8E6C9;}
+.boost-step[data-lv="2"].lit{background:#81C784;}
+.boost-step[data-lv="3"].lit{background:#52B788;}
+.boost-step[data-lv="4"].lit{background:#2D9B6F;}
+.boost-step[data-lv="5"].lit{background:#1A6B4A;}
+.boost-tag{font-size:11px;font-weight:600;min-width:46px;text-align:right;color:var(--ink3);}
+
+/* DAY BLOCKS */
+.day-block{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:7px;background:var(--surface);}
+.day-hd{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--surface2);cursor:pointer;user-select:none;transition:background .15s;}
+.day-hd:hover{background:var(--surface3);}
+.day-toggle{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);background:var(--surface);display:grid;place-items:center;font-size:10px;flex-shrink:0;transition:all .15s;}
+.day-toggle.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.day-name-th{font-size:14px;font-weight:500;flex:1;}
+.day-summary{font-size:11px;color:var(--ink4);text-align:right;max-width:160px;}
+.day-body{display:none;padding:12px 13px;}
+.day-body.open{display:block;}
+
+/* HOUR GRID */
+.hgrid-wrap{margin-bottom:10px;}
+.hgrid-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink4);margin-bottom:6px;}
+.hour-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;}
+@media(max-width:480px){.hour-grid{grid-template-columns:repeat(6,1fr);}}
+.hc{aspect-ratio:1;border-radius:4px;border:1px solid var(--border2);background:var(--surface3);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .1s;user-select:none;}
+.hc .hn{font-size:11px;font-weight:600;color:var(--ink3);}
+.hc .hl{font-size:8px;color:var(--ink5);}
+.hc.on{background:var(--accent);border-color:var(--accent);}
+.hc.on .hn{color:#fff;}
+.hc.on .hl{color:rgba(255,255,255,.6);}
+.hc:hover:not(.on){background:var(--surface2);border-color:var(--ink5);}
+
+/* SESSION SLOTS */
+.slots-hd{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink4);margin-bottom:6px;}
+.slot-list{display:flex;flex-direction:column;gap:5px;margin-bottom:6px;}
+.slot{display:flex;align-items:center;gap:6px;background:var(--surface2);border-radius:var(--r-sm);padding:7px 9px;}
+.slot-selects{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.slot-selects select{width:52px;padding:4px 5px;font-size:12px;}
+.slot-sep{font-size:11px;color:var(--ink4);}
+.slot-subj{flex:1;}
+.slot-subj select{font-size:13px;}
+.slot-rm{width:22px;height:22px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--ink4);cursor:pointer;display:grid;place-items:center;font-size:13px;flex-shrink:0;}
+.slot-rm:hover{background:#fee2e2;color:#dc2626;border-color:#fca5a5;}
+.slot-add{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:var(--r-sm);border:1px dashed var(--border2);background:transparent;font-family:'Sarabun',sans-serif;font-size:12px;color:var(--ink4);cursor:pointer;width:100%;transition:all .15s;}
+.slot-add:hover{border-color:var(--accent-mid);color:var(--accent);background:var(--accent-bg);}
+
+/* GEN BTN */
+.gen-btn{width:100%;padding:14px;background:var(--ink);color:#fff;border:none;border-radius:var(--r);font-family:'Sarabun',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:4px;}
+.gen-btn:hover{background:var(--ink2);}
+.gen-btn:active{transform:scale(.99);}
+
+/* SCHEDULE */
+.sched-meta{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.sched-title{font-family:'Noto Serif Thai',serif;font-size:19px;font-weight:600;}
+.sched-sub{font-size:12px;color:var(--ink3);margin-top:2px;}
+.btn-ghost{padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);font-family:'Sarabun',sans-serif;font-size:12px;color:var(--ink3);cursor:pointer;}
+.btn-ghost:hover{background:var(--surface2);}
+.week-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink5);margin:14px 0 7px;padding:0 1px;}
+.day-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:7px;}
+.day-card-hd{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--border);}
+.dc-name{font-size:13px;font-weight:600;}
+.dc-date{font-size:11px;color:var(--ink4);}
+.dc-hrs{font-size:11px;font-weight:600;color:var(--ink3);background:var(--surface2);padding:2px 7px;border-radius:9px;}
+.sess-rows{padding:7px 10px;display:flex;flex-direction:column;gap:5px;}
+.sess{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);transition:opacity .2s;}
+.sess-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sess-info{flex:1;}
+.sess-subj{font-size:13px;font-weight:500;}
+.sess-time{font-size:11px;color:var(--ink4);margin-top:1px;}
+.sess-dur{font-size:11px;font-weight:600;padding:2px 7px;border-radius:8px;flex-shrink:0;}
+.sess-check{font-size:17px;cursor:pointer;padding:2px;border-radius:4px;flex-shrink:0;}
+.sess-check:hover{transform:scale(1.15);}
+.sess.done .sess-subj{text-decoration:line-through;opacity:.45;}
+.no-sess{padding:12px;text-align:center;font-size:12px;color:var(--ink5);}
+
+/* PROGRESS */
+.stat-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.stat{flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px;text-align:center;}
+.stat strong{display:block;font-size:20px;font-weight:600;color:var(--accent);line-height:1.1;}
+.stat span{font-size:11px;color:var(--ink4);}
+.prog-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.prog-lbl{font-size:13px;min-width:96px;}
+.prog-bar{flex:1;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+.prog-val{font-size:11px;font-weight:600;color:var(--ink3);min-width:46px;text-align:right;}
+.alert-box{padding:10px 13px;border-radius:var(--r-sm);font-size:13px;margin-bottom:12px;display:flex;gap:7px;}
+.alert-ok{background:var(--accent-bg);color:var(--accent);}
+.alert-warn{background:#FFF8E1;color:#92400E;}
+.empty{padding:50px 20px;text-align:center;color:var(--ink4);}
+.empty .ei{font-size:32px;margin-bottom:9px;}
+.empty p{font-size:13px;line-height:1.7;}
+
+@media print{header,.nav,.gen-btn,.btn-ghost,.slot-rm,.slot-add,.sess-check{display:none!important;}.panel{display:block!important;}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="hd">
+    <div class="hd-brand">
+      <div class="hd-mark">📚</div>
+      <div><h1>ตารางติว</h1><p>Study Planner</p></div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn on" onclick="goTab('setup',this)">ตั้งค่า</button>
+      <button class="nav-btn" onclick="goTab('schedule',this)">ตาราง</button>
+      <button class="nav-btn" onclick="goTab('progress',this)">คืบหน้า</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- SETUP -->
+<div class="panel on" id="panel-setup">
+  <div class="sec">
+    <div class="sec-hd"><div class="sec-ico">🎯</div><div class="sec-lbl">ข้อมูลการสอบ</div></div>
+    <div class="card">
+      <div class="row2">
+        <div class="fi"><label>ชื่อการสอบ</label><input type="text" id="examName" placeholder="เช่น TCAS, A-Level"></div>
+        <div class="fi"><label>วันที่เหลือ</label><input type="number" id="daysLeft" value="60" min="1" max="365"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd"><div class="sec-ico">📖</div><div class="sec-lbl">วิชาที่เรียน</div></div>
+    <div class="card">
+      <div class="chip-grid" id="chipGrid">
+        <div class="chip on" onclick="toggleChip(this)" data-s="คณิตศาสตร์">คณิตศาสตร์</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="ฟิสิกส์">ฟิสิกส์</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="เคมี">เคมี</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="ชีววิทยา">ชีววิทยา</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="ภาษาไทย">ภาษาไทย</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="ภาษาอังกฤษ">ภาษาอังกฤษ</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="สังคมศึกษา">สังคมศึกษา</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="PAT1">PAT1</div>
+        <div class="chip" onclick="toggleChip(this)" data-s="GPAX">GPAX</div>
+      </div>
+      <div class="add-row">
+        <input type="text" id="customSubj" placeholder="เพิ่มวิชาอื่น..." onkeydown="if(event.key==='Enter')addSubject()">
+        <button class="btn-sm" onclick="addSubject()">+ เพิ่ม</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd"><div class="sec-ico">⚡</div><div class="sec-lbl">Boost Steps — ระดับความสำคัญ</div></div>
+    <div class="card" id="boostCard">
+      <p style="font-size:13px;color:var(--ink4);">เลือกวิชาก่อนเพื่อกำหนด Boost Steps</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd"><div class="sec-ico">⏱</div><div class="sec-lbl">เวลาแต่ละวัน — เลือกชั่วโมง &amp; กำหนดวิชา</div></div>
+    <div id="dayBlocks"></div>
+  </div>
+
+  <button class="gen-btn" onclick="generate()">✨ สร้างตารางเรียน</button>
+</div>
+
+<!-- SCHEDULE -->
+<div class="panel" id="panel-schedule">
+  <div id="schedOut"><div class="empty"><div class="ei">📋</div><p>กลับไปที่ <b>ตั้งค่า</b><br>แล้วกด <b>สร้างตารางเรียน</b></p></div></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="panel" id="panel-progress">
+  <div id="progOut"><div class="empty"><div class="ei">📊</div><p>สร้างตารางก่อนเพื่อดูความคืบหน้า</p></div></div>
+</div>
+</main>
+</div>
+
+<script>
+const DAYS_TH=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const COLORS=['#1A6B4A','#1565C0','#6A1B9A','#BF360C','#00695C','#4E342E','#AD1457','#1B5E20','#E65100'];
+const CLIGHTS=['#EBF5F0','#E3F2FD','#F3E5F5','#FBE9E7','#E0F2F1','#EFEBE9','#FCE4EC','#E8F5E9','#FFF3E0'];
+const BOOST_LBL=['','เบา','ปกติ','สำคัญ','เร่งด่วน','สูงสุด'];
+const HOUR_LBL=h=>h<12?'เช้า':h===12?'เที่ยง':h<17?'บ่าย':h<20?'เย็น':'ค่ำ';
+
+let selectedSubjects=new Set(['คณิตศาสตร์']);
+let priorities={};
+let dayData={};
+let generated=null;
+let done=new Set();
+
+function initDays(){
+  const cont=document.getElementById('dayBlocks');
+  cont.innerHTML='';
+  for(let d=0;d<7;d++){
+    dayData[d]={active:d>=1&&d<=5,hours:new Set(),sessions:[]};
+    if(d>=1&&d<=5){[9,10,15,16,19,20].forEach(h=>dayData[d].hours.add(h));}
+    const bl=document.createElement('div');
+    bl.className='day-block';bl.id='dbl-'+d;
+    bl.innerHTML=`<div class="day-hd" onclick="toggleDay(${d})">
+      <div class="day-toggle ${dayData[d].active?'on':''}" id="dtgl-${d}">${dayData[d].active?'✓':''}</div>
+      <div class="day-name-th">${DAYS_TH[d]}</div>
+      <div class="day-summary" id="dsum-${d}"></div>
+    </div>
+    <div class="day-body ${dayData[d].active?'open':''}" id="dbody-${d}">
+      <div class="hgrid-wrap">
+        <div class="hgrid-label">เลือกชั่วโมงที่ว่าง</div>
+        <div class="hour-grid" id="hgrid-${d}">${buildHG(d)}</div>
+      </div>
+      <div class="slots-hd">กำหนดวิชาแต่ละช่วงเวลา</div>
+      <div class="slot-list" id="slots-${d}"></div>
+      <button class="slot-add" onclick="addSlot(${d})">＋ เพิ่มช่วงเรียน</button>
+    </div>`;
+    cont.appendChild(bl);
+    updateSum(d);
+  }
+}
+
+function buildHG(d){
+  let h='';
+  for(let hr=6;hr<=23;hr++){
+    const on=dayData[d].hours.has(hr);
+    h+=`<div class="hc ${on?'on':''}" id="hc-${d}-${hr}" onclick="toggleHour(${d},${hr})"><span class="hn">${hr}</span><span class="hl">${HOUR_LBL(hr)}</span></div>`;
+  }return h;
+}
+
+function toggleHour(d,hr){
+  if(dayData[d].hours.has(hr))dayData[d].hours.delete(hr);
+  else dayData[d].hours.add(hr);
+  document.getElementById(`hc-${d}-${hr}`).classList.toggle('on',dayData[d].hours.has(hr));
+  updateSum(d);
+}
+
+function toggleDay(d){
+  dayData[d].active=!dayData[d].active;
+  document.getElementById('dtgl-'+d).className='day-toggle'+(dayData[d].active?' on':'');
+  document.getElementById('dtgl-'+d).textContent=dayData[d].active?'✓':'';
+  document.getElementById('dbody-'+d).className='day-body'+(dayData[d].active?' open':'');
+  updateSum(d);
+}
+
+function sumHrs(d){
+  const hrs=[...dayData[d].hours].sort((a,b)=>a-b);
+  if(!hrs.length)return'ยังไม่เลือก';
+  const groups=[];let g=[hrs[0]];
+  for(let i=1;i<hrs.length;i++){hrs[i]-hrs[i-1]===1?g.push(hrs[i]):(groups.push(g),g=[hrs[i]]);}
+  groups.push(g);
+  const parts=groups.map(g=>`${g[0]}–${g[g.length-1]+1}น.`);
+  return parts.slice(0,3).join(' ')+(parts.length>3?'…':'')+` (${hrs.length}ชม.)`;
+}
+
+function updateSum(d){
+  const el=document.getElementById('dsum-'+d);
+  if(el)el.textContent=dayData[d].active?sumHrs(d):'หยุด';
+  renderSlots(d);
+}
+
+function addSlot(d){
+  const hrs=[...dayData[d].hours].sort((a,b)=>a-b);
+  if(!hrs.length){alert('กรุณาเลือกชั่วโมงก่อน');return;}
+  const used=new Set(dayData[d].sessions.flatMap(s=>{const r=[];for(let h=s.start;h<s.end;h++)r.push(h);return r;}));
+  const free=hrs.filter(h=>!used.has(h));
+  if(!free.length){alert('ไม่มีชั่วโมงว่างเหลือ');return;}
+  const start=free[0];
+  const end=free[Math.min(1,free.length-1)]+1;
+  const subjs=[...selectedSubjects];
+  dayData[d].sessions.push({start,end,subject:subjs[0]||''});
+  renderSlots(d);
+}
+
+function removeSlot(d,i){dayData[d].sessions.splice(i,1);renderSlots(d);}
+
+function renderSlots(d){
+  const cont=document.getElementById('slots-'+d);
+  if(!cont)return;
+  const hrs=[...dayData[d].hours].sort((a,b)=>a-b);
+  const subjs=[...selectedSubjects];
+  const subjOpts=subjs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const allHrs=[...new Set([...hrs,...hrs.map(h=>h+1)])].sort((a,b)=>a-b);
+  const startOpts=hrs.map(h=>`<option value="${h}">${h}:00</option>`).join('');
+  const endOpts=[...new Set(hrs.map(h=>h+1))].sort((a,b)=>a-b).map(h=>`<option value="${h}">${h}:00</option>`).join('');
+  cont.innerHTML=dayData[d].sessions.map((s,i)=>{
+    const so=startOpts.replace(`value="${s.start}"`,`value="${s.start}" selected`);
+    const eo=endOpts.replace(`value="${s.end}"`,`value="${s.end}" selected`);
+    const subo=subjOpts.replace(`value="${s.subject}"`,`value="${s.subject}" selected`);
+    return`<div class="slot">
+      <div class="slot-selects">
+        <select onchange="dayData[${d}].sessions[${i}].start=+this.value">${so}</select>
+        <span class="slot-sep">–</span>
+        <select onchange="dayData[${d}].sessions[${i}].end=+this.value">${eo}</select>
+      </div>
+      <div class="slot-subj"><select onchange="dayData[${d}].sessions[${i}].subject=this.value">${subo}</select></div>
+      <button class="slot-rm" onclick="removeSlot(${d},${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+/* CHIPS */
+function toggleChip(el){
+  const s=el.dataset.s;
+  if(selectedSubjects.has(s)){selectedSubjects.delete(s);el.classList.remove('on');}
+  else{selectedSubjects.add(s);el.classList.add('on');}
+  updateBoost();for(let d=0;d<7;d++)renderSlots(d);
+}
+
+function addSubject(){
+  const inp=document.getElementById('customSubj'),v=inp.value.trim();
+  if(!v||selectedSubjects.has(v)){inp.value='';return;}
+  const chip=document.createElement('div');
+  chip.className='chip on';chip.dataset.s=v;chip.textContent=v;
+  chip.onclick=function(){toggleChip(this);};
+  document.getElementById('chipGrid').appendChild(chip);
+  selectedSubjects.add(v);inp.value='';
+  updateBoost();for(let d=0;d<7;d++)renderSlots(d);
+}
+
+/* BOOST */
+function updateBoost(){
+  const cont=document.getElementById('boostCard');
+  const subjs=[...selectedSubjects];
+  if(!subjs.length){cont.innerHTML='<p style="font-size:13px;color:var(--ink4);">เลือกวิชาก่อนเพื่อกำหนด Boost Steps</p>';return;}
+  const g=document.createElement('div');g.className='boost-grid';
+  subjs.forEach(s=>{
+    if(!priorities[s])priorities[s]=3;
+    const row=document.createElement('div');row.className='boost-row';
+    const safe=s.replace(/[^a-z0-9]/gi,'_');
+    const steps=[1,2,3,4,5].map(lv=>`<div class="boost-step${lv<=priorities[s]?' lit':''}" data-lv="${lv}" onclick="setBoost('${s.replace(/'/g,"\\'")}',${lv},this.parentElement)"></div>`).join('');
+    row.innerHTML=`<div class="boost-name">${s}</div><div class="boost-steps" id="bs-${safe}">${steps}</div><div class="boost-tag" id="bt-${safe}">${BOOST_LBL[priorities[s]]}</div>`;
+    g.appendChild(row);
+  });
+  cont.innerHTML='';cont.appendChild(g);
+}
+
+function setBoost(s,lv,cont){
+  priorities[s]=lv;
+  cont.querySelectorAll('.boost-step').forEach(el=>el.classList.toggle('lit',+el.dataset.lv<=lv));
+  const safe=s.replace(/[^a-z0-9]/gi,'_');
+  const t=document.getElementById('bt-'+safe);if(t)t.textContent=BOOST_LBL[lv];
+}
+
+/* GENERATE */
+function generate(){
+  const days=parseInt(document.getElementById('daysLeft').value)||60;
+  const examName=document.getElementById('examName').value||'สอบเข้ามหาวิทยาลัย';
+  const subjs=[...selectedSubjects];
+  if(!subjs.length){alert('กรุณาเลือกอย่างน้อย 1 วิชา');return;}
+
+  const weights=subjs.map(s=>priorities[s]||3);
+  const totalW=weights.reduce((a,b)=>a+b,0);
+  const ratios=subjs.map((s,i)=>weights[i]/totalW);
+  const subjColors={};
+  subjs.forEach((s,i)=>{subjColors[s]={bg:COLORS[i%COLORS.length],light:CLIGHTS[i%CLIGHTS.length]};});
+
+  const schedule=[];
+  const today=new Date();
+
+  for(let day=0;day<Math.min(days,84);day++){
+    const date=new Date(today);date.setDate(today.getDate()+day);
+    const dw=date.getDay();
+    const dd=dayData[dw];
+    if(!dd.active||dd.hours.size===0)continue;
+
+    const daySched={date:new Date(date),dow:dw,sessions:[]};
+    const hrs=[...dd.hours].sort((a,b)=>a-b);
+
+    if(dd.sessions.length>0){
+      // Use manually-defined sessions
+      dd.sessions.forEach(s=>{
+        const dur=Math.max(1,s.end-s.start);
+        daySched.sessions.push({subject:s.subject,startH:s.start,endH:s.end,hours:dur,color:subjColors[s.subject]||{bg:COLORS[0],light:CLIGHTS[0]}});
+      });
+    } else {
+      // Auto distribute by boost weight
+      let hIdx=0;
+      subjs.forEach((s,si)=>{
+        if(hIdx>=hrs.length)return;
+        const take=Math.max(1,Math.round(hrs.length*ratios[si]));
+        const actual=Math.min(take,hrs.length-hIdx);
+        const startH=hrs[hIdx];
+        const endH=hrs[Math.min(hIdx+actual-1,hrs.length-1)]+1;
+        daySched.sessions.push({subject:s,startH,endH,hours:actual,color:subjColors[s]});
+        hIdx+=actual;
+      });
+    }
+    schedule.push(daySched);
+  }
+
+  generated={schedule,subjs,subjColors,days,examName};
+  done=new Set();
+  renderSchedule();renderProgress();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-schedule').classList.add('on');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('on',i===1));
+}
+
+/* RENDER SCHEDULE */
+function renderSchedule(){
+  if(!generated){document.getElementById('schedOut').innerHTML='<div class="empty"><div class="ei">📋</div><p>ยังไม่มีตาราง</p></div>';return;}
+  const{schedule,examName,days}=generated;
+  const totalH=schedule.reduce((a,d)=>a+d.sessions.reduce((b,s)=>b+s.hours,0),0);
+  let html=`<div class="sched-meta">
+    <div><div class="sched-title">${examName}</div><div class="sched-sub">เหลือ ${days} วัน · ${schedule.length} วันเรียน · ${totalH} ชม.รวม</div></div>
+    <button class="btn-ghost" onclick="window.print()">🖨 พิมพ์</button>
+  </div>`;
+  let cw=-1,wn=0;
+  schedule.forEach((d,di)=>{
+    const w=getWeek(d.date);
+    if(w!==cw){cw=w;wn++;html+=`<div class="week-lbl">สัปดาห์ที่ ${wn}</div>`;}
+    const th=d.sessions.reduce((a,s)=>a+s.hours,0);
+    html+=`<div class="day-card"><div class="day-card-hd">
+      <div class="dc-name">${DAYS_TH[d.dow]}</div>
+      <div class="dc-date">${d.date.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}</div>
+      <div class="dc-hrs">${th} ชม.</div>
+    </div><div class="sess-rows">`;
+    if(!d.sessions.length){html+='<div class="no-sess">— ไม่มีเซสชัน —</div>';}
+    else d.sessions.forEach((s,si)=>{
+      const sid=`${di}-${si}`;const isDone=done.has(sid);
+      html+=`<div class="sess ${isDone?'done':''}" id="sess-${sid}" style="background:${isDone?'var(--surface2)':s.color.light};">
+        <div class="sess-dot" style="background:${s.color.bg};${isDone?'opacity:.35':''}"></div>
+        <div class="sess-info">
+          <div class="sess-subj" style="color:${isDone?'var(--ink4)':s.color.bg}">${s.subject}</div>
+          <div class="sess-time">${s.startH}:00 – ${s.endH}:00</div>
+        </div>
+        <div class="sess-dur" style="background:${s.color.light};color:${s.color.bg}">${s.hours}ชม.</div>
+        <div class="sess-check" onclick="toggleDone('${sid}')">${isDone?'✅':'⭕'}</div>
+      </div>`;
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('schedOut').innerHTML=html;
+}
+
+function toggleDone(sid){done.has(sid)?done.delete(sid):done.add(sid);renderSchedule();renderProgress();}
+
+/* RENDER PROGRESS */
+function renderProgress(){
+  if(!generated){document.getElementById('progOut').innerHTML='<div class="empty"><div class="ei">📊</div><p>สร้างตารางก่อน</p></div>';return;}
+  const{schedule,subjs,subjColors,days}=generated;
+  const tH={},dH={};subjs.forEach(s=>{tH[s]=0;dH[s]=0;});
+  schedule.forEach((d,di)=>d.sessions.forEach((s,si)=>{
+    tH[s.subject]=(tH[s.subject]||0)+s.hours;
+    if(done.has(`${di}-${si}`))dH[s.subject]=(dH[s.subject]||0)+s.hours;
+  }));
+  const aH=Object.values(tH).reduce((a,b)=>a+b,0);
+  const dA=Object.values(dH).reduce((a,b)=>a+b,0);
+  const pct=aH?Math.round(dA/aH*100):0;
+  let html=`<div class="stat-bar">
+    <div class="stat"><strong>${days}</strong><span>วันที่เหลือ</span></div>
+    <div class="stat"><strong>${aH}</strong><span>ชม.รวม</span></div>
+    <div class="stat"><strong>${dA}</strong><span>เรียนแล้ว</span></div>
+    <div class="stat"><strong>${pct}%</strong><span>เสร็จสิ้น</span></div>
+  </div>
+  <div class="alert-box ${pct>=80?'alert-ok':pct>0?'alert-ok':'alert-warn'}">${pct>=80?'🎉 ยอดเยี่ยมมาก! คุณทำได้ดีมาก':pct>0?`📈 คืบหน้า ${pct}% — ทำต่อไปอย่าหยุด!`:'⏰ ยังไม่ได้เริ่มเลย ไปดูตารางเรียนเลย!'}</div>
+  <div class="card">
+    <div class="sec-hd" style="margin-bottom:12px;"><div class="sec-ico">📈</div><div class="sec-lbl">ความคืบหน้าแต่ละวิชา</div></div>`;
+  subjs.forEach(s=>{
+    const t=tH[s]||0,dn=dH[s]||0,p=t?Math.round(dn/t*100):0;
+    html+=`<div class="prog-row">
+      <div class="prog-lbl">${s}</div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${p}%;background:${subjColors[s].bg}"></div></div>
+      <div class="prog-val">${dn}/${t}ชม.</div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('progOut').innerHTML=html;
+}
+
+function getWeek(date){const d=new Date(date);d.setHours(0,0,0,0);d.setDate(d.getDate()+4-(d.getDay()||7));const y=new Date(d.getFullYear(),0,1);return Math.ceil((((d-y)/86400000)+1)/7);}
+
+function goTab(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('panel-'+name).classList.add('on');
+  btn.classList.add('on');
+}
+
+initDays();
+updateBoost();
+</script>
+</body>
+</html>
